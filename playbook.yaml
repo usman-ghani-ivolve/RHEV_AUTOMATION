@@ -1,0 +1,14 @@
+---
+- hosts: localhost
+  gather_facts: false
+  any_errors_fatal: true
+  vars:
+    data: []  
+    insecure: 'yes'
+  vars_files:
+    - ./vars.yaml
+  roles:
+  - role: virtual-machine
+  collections:
+    - ovirt
+

@@ -1,0 +1,37 @@
+---
+# defaults file for virtual-machine
+guest_domain: ivlab.cloud
+hostname_vcenter: "10.82.11.10"
+username_vcenter: "administrator@ivlab.cloud"
+password_vcenter: "letmein2iVolve!!"
+validate_certs_bool: "no"
+datacenter_name: "IV-LAB"
+folder_name: vm/
+vm_name: cloudnewvm
+new_vm_name: cloudvmnew
+vm_state: poweredon
+os_guest_id: ubuntu64Guest #centos64Guest # os identifier reference https://vdc-repo.vmware.com/vmwb-repository/dcr-public/3d076a12-29a2-4d17-9269-cb8150b5a37f/8b5969e2-1a66-4425-af17-feff6d6f705d/doc/vim.vm.GuestOsDescriptor.GuestOsIdentifier.html
+template: "Ubuntu20.04.template"
+#disk spec
+disk_size_gb: 10
+disk_type: thin
+datastore_name: ceph-vol2
+
+#hardware details
+vm_memory_mb: 2048
+vm_num_cpus: 2
+scsi_type: paravirtual
+
+#cdrom details
+image_type: iso
+image_iso_path: "[esxi1] CentOS-7-x86_64-Minimal-2009.iso"
+
+#network details
+network_name: "VM Network" #client7 #VM Network
+network_device_type: vmxnet3
+wait_for_ip_address: yes
+
+#virtual machine UUID
+#vm_uuid: "502ae22a-e074-68e9-7ae7-28ca7c080dd6" #422ac0a9-c065-c3a4-19c5-f2efa25b5812
+vm_uuid: 422aa3bb-574e-ee91-e84a-1d1de81f2aa0 #422a7967-0a89-b0fa-8fed-b11577becbd3
+

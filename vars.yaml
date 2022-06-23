@@ -1,0 +1,13 @@
+# AUTH VARS
+url: https://rhvm.ivlab.io/ovirt-engine/api
+password: letmein2iVolve@
+username: admin@internal
+
+# VM VARS
+action: create-vm
+storage_domain: RHVM_DATA
+cluster: Default
+template: Ubuntu-20
+vm_name: vm0
+start: 500
+stop: 501

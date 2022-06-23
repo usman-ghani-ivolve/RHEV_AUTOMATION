@@ -1,0 +1,42 @@
+- name: login
+  ovirt_auth:
+      url: "{{url}}"
+      password: "{{password}}"
+      username: "{{username}}"
+      insecure: "{{insecure}}"
+- ovirt_vm_info:
+    auth: "{{ ovirt_auth }}"
+    pattern: name=vm*
+  register: result
+
+- set_fact:
+  #state: '{{ state | default([]) + [{ "name": item.name, "status": item.status }]  }}'
+    state: '{{ state | default([]) + [item.status]  }}'
+  loop: "{{ result.ovirt_vms }}"
+  no_log: true
+
+- debug:
+    var: state
+
+    #- fail:
+    #    msg: vm is pending
+    #  when: desired_state is in state
+
+- name: Wait until vms are created
+  block:
+    - ovirt_vm_info:
+        auth: "{{ ovirt_auth }}"
+        pattern: name=vm*
+      register: result
+    - debug:
+        msg: The {{item.name}} is still creating ...
+      when: item.status == "image_locked"
+      loop: "{{ result.ovirt_vms }}"
+
+      #  loop: "{{ result.ovirt_vms }}"
+      #  no_log: true
+      #  register: stack_info
+      #  until: stack_info.stdout == 'CREATE_COMPLETE' or stack_info.stdout == 'CREATE_FAILED'
+      #  retries: 30
+      #  delay: 5
+      #  failed_when: stack_info.stdout == 'CREATE_FAILED'

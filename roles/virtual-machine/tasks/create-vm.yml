@@ -1,0 +1,55 @@
+- name: Fetching Auth Token
+  ovirt_auth:
+      url: "{{ url }}" 
+      password: "{{ password }}" 
+      username: "{{ username }}" 
+      insecure: "{{ insecure }}"
+
+- name: Check if Storage Domain exist
+  ovirt_storage_domain_info:
+    auth: "{{ ovirt_auth }}"
+    pattern: name={{ storage_domain }}
+  register: result
+
+- name: Parsing Storage Domain Data
+  set_fact:
+    data_domain: "{{ data_domain | default([]) + [item.name] }}"
+  loop: "{{ result.ovirt_storage_domains }}"
+  no_log: true
+
+- name: Exit if Storage Domain not exist
+  fail:
+    msg:  Storage Domain {{ storage_domain }} does not exist
+  when: storage_domain is not in data_domain
+
+- name: Spawning Virtual Machines
+  ovirt_vm:
+    auth: "{{ ovirt_auth }}"
+    state: present
+    storage_domain: "{{ storage_domain }}"
+    name: "{{ vm_name }}{{ item  }}"
+    template: "{{ template }}"
+    cluster: "{{cluster}}"
+  with_sequence:
+    start="{{ start }}"
+    end="{{ stop }}"
+  register: result
+
+- name: Get Virtual Machines Status
+  ovirt_vm_info:
+    auth: "{{ ovirt_auth }}"
+    pattern: name=vm0{{ item }}
+  with_sequence:
+    start="{{ start }}"
+    end="{{ stop }}"
+  register: result
+
+- name: Parsing Virtual Machine Data 
+  set_fact:
+    data: '{{ data + [{ "name": item.ovirt_vms[0].name, "status": item.ovirt_vms[0].status }]  }}'
+  loop: "{{ result.results }}"
+  no_log: true
+
+- name: Display Virtual Machines Status
+  debug:
+    var: data
