@@ -30,6 +30,8 @@
     name: "{{ vm_name }}{{ item  }}"
     template: "{{ template }}"
     cluster: "{{cluster}}"
+    nics:
+      - name: test123
   with_sequence:
     start="{{ start }}"
     end="{{ stop }}"
