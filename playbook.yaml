@@ -13,7 +13,7 @@
   collections:
     - ovirt
   tasks:
-    - name: Log out oVirt Engine
+    - name: Flush Auth Token
       ovirt_auth:
         state: absent
         ovirt_auth: "{{ ovirt_auth }}"

@@ -7,11 +7,13 @@
 
 - name: Check if Storage Domain exist
   block:
-    - ovirt_storage_domain_info:
+    - name: Get Existing Domains
+      ovirt_storage_domain_info:
         auth: "{{ ovirt_auth }}"
         pattern: name={{ storage_domain }}
       register: result
-    - set_fact:
+    - name: Parsing Data Domain Response
+      set_fact:
         data_domain: "{{ data_domain | default([]) + [item.name] }}"
       loop: "{{ result.ovirt_storage_domains }}"
       no_log: true
@@ -22,34 +24,47 @@
   when: storage_domain is not in data_domain
 
 - name: Spawning Virtual Machines
-  ovirt_vm:
-    auth: "{{ ovirt_auth }}"
-    state: present
-    storage_domain: "{{ storage_domain }}"
-    name: "{{ vm_name }}{{ item }}.domain.com"
-    template: "{{ template }}"
-    cluster: "{{cluster}}"
-    nics:
-      - name: "{{ vlan }}"
-  with_sequence:
-    start="{{ start }}"
-    end="{{ stop }}"
-  register: result
+  block:
+    - name: Creating Virtual Machins
+      ovirt_vm:
+        auth: "{{ ovirt_auth }}"
+        state: present
+        clone: yes
+        storage_domain: "{{ storage_domain }}"
+        name: "{{ vm_name }}{{ item }}.domain.com"
+        template: "{{ template }}"
+        cluster: "{{cluster}}"
+      with_sequence:
+        start="{{ start }}"
+        end="{{ stop }}"
+      register: result
+    - name: Update Virtual Machine NIC
+      ovirt_nic:
+        auth: "{{ ovirt_auth }}"
+        vm: "{{ vm_name }}{{ item }}.domain.com"
+        name: "nic1"
+        profile: "{{ nic_profile }}"
+        network: "{{ nic_network }}"
+        state: present
+      with_sequence:
+        start="{{ start }}"
+        end="{{ stop }}"
 
 - name: Get Virtual Machines Status
-  ovirt_vm_info:
-    auth: "{{ ovirt_auth }}"
-    pattern: name=vm0{{ item }}.domain.com
-  with_sequence:
-    start="{{ start }}"
-    end="{{ stop }}"
-  register: result
-
-- name: Parsing Virtual Machine Data 
-  set_fact:
-    data: '{{ data + [{ "name": item.ovirt_vms[0].name, "status": item.ovirt_vms[0].status }]  }}'
-  loop: "{{ result.results }}"
-  no_log: true
+  block:
+    - name: Get Virtual Machine Data
+      ovirt_vm_info:
+        auth: "{{ ovirt_auth }}"
+        pattern: name=vm0{{ item }}.domain.com
+      with_sequence:
+        start="{{ start }}"
+        end="{{ stop }}"
+      register: result
+    - name: Parsing Virtual Machine Reponse 
+      set_fact:
+        data: '{{ data + [{ "name": item.ovirt_vms[0].name, "status": item.ovirt_vms[0].status }]  }}'
+      loop: "{{ result.results }}"
+      no_log: true
 
 - name: Display Virtual Machines Status
   debug:
