@@ -6,6 +6,7 @@ action: create-vm
 storage_domain: RHVM_DATA
 cluster: Default
 template: Ubuntu-20
+vlan: test123
 vm_name: vm0
 start: 500
-stop: 502
+stop: 501

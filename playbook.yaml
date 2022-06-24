@@ -12,4 +12,8 @@
   - role: virtual-machine
   collections:
     - ovirt
-
+  tasks:
+    - name: Log out oVirt Engine
+      ovirt_auth:
+        state: absent
+        ovirt_auth: "{{ ovirt_auth }}"

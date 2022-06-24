@@ -1,4 +1,2 @@
 ---
-# tasks file for virtual-machine
-#- include: create-vm.yml
-- include: "{{ action }}.yml"
+- include_tasks: "{{ action }}.yml"

@@ -6,16 +6,15 @@
       insecure: "{{ insecure }}"
 
 - name: Check if Storage Domain exist
-  ovirt_storage_domain_info:
-    auth: "{{ ovirt_auth }}"
-    pattern: name={{ storage_domain }}
-  register: result
-
-- name: Parsing Storage Domain Data
-  set_fact:
-    data_domain: "{{ data_domain | default([]) + [item.name] }}"
-  loop: "{{ result.ovirt_storage_domains }}"
-  no_log: true
+  block:
+    - ovirt_storage_domain_info:
+        auth: "{{ ovirt_auth }}"
+        pattern: name={{ storage_domain }}
+      register: result
+    - set_fact:
+        data_domain: "{{ data_domain | default([]) + [item.name] }}"
+      loop: "{{ result.ovirt_storage_domains }}"
+      no_log: true
 
 - name: Exit if Storage Domain not exist
   fail:
@@ -27,11 +26,11 @@
     auth: "{{ ovirt_auth }}"
     state: present
     storage_domain: "{{ storage_domain }}"
-    name: "{{ vm_name }}{{ item  }}"
+    name: "{{ vm_name }}{{ item }}.domain.com"
     template: "{{ template }}"
     cluster: "{{cluster}}"
     nics:
-      - name: test123
+      - name: "{{ vlan }}"
   with_sequence:
     start="{{ start }}"
     end="{{ stop }}"
@@ -40,7 +39,7 @@
 - name: Get Virtual Machines Status
   ovirt_vm_info:
     auth: "{{ ovirt_auth }}"
-    pattern: name=vm0{{ item }}
+    pattern: name=vm0{{ item }}.domain.com
   with_sequence:
     start="{{ start }}"
     end="{{ stop }}"
