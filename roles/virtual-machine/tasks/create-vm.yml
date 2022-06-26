@@ -62,7 +62,7 @@
       register: result
     - name: Parsing Virtual Machine Reponse 
       set_fact:
-        data: '{{ data + [{ "name": item.ovirt_vms[0].name, "status": item.ovirt_vms[0].status }]  }}'
+        data: '{{ data | default([]) + [{ "name": item.ovirt_vms[0].name, "status": item.ovirt_vms[0].status }]  }}'
       loop: "{{ result.results }}"
       no_log: true
 

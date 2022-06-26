@@ -3,11 +3,11 @@ url: https://rhvm.ivlab.io/ovirt-engine/api
 
 # VM VARS
 action: create-vm
-storage_domain: hosted_storage #RHVM_DATA
+storage_domain: RHVM_DATA #hosted_storage
 cluster: Default
 template: Ubuntu-20
 nic_profile: vyos_ali
 nic_network: vyos_ali
 vm_name: vm0
 start: 500
-stop: 500
+stop: 501
